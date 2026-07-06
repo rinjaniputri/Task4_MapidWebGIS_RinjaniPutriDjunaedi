@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RainSafe Bogor - Map</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">RainSafe Bogor</div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="map.html" class="active">Map</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="page-title">
+      <h1>Peta Zona Bahaya Banjir</h1>
+      <p>
+        Peta ini menampilkan <strong>273 zona bahaya banjir Kota Bogor</strong>
+        (data GeoJSON dari MAPID), diwarnai berdasarkan kelas bahaya.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Kontrol Peta</h2>
+      <p>Tampilkan/sembunyikan lapisan zona bahaya, dan sorot kelas paling berbahaya.</p>
+      <div class="map-controls">
+        <button id="layer-toggle" class="button-solid" disabled>Sembunyikan Zona Bahaya</button>
+        <button id="highlight-btn" class="button-solid" disabled>Sorot Kelas Tinggi</button>
+      </div>
+      <p id="map-status" class="data-note">Memuat zona bahaya&hellip;</p>
+    </section>
+
+    <section class="map-container">
+      <div id="map" class="map-box"></div>
+
+      <div class="legend">
+        <h3>Legenda (Kelas Bahaya)</h3>
+        <ul>
+          <li><span class="k1"></span> Tinggi</li>
+          <li><span class="k2"></span> Cukup Tinggi</li>
+          <li><span class="k3"></span> Sedang</li>
+          <li><span class="k4"></span> Cukup Rendah</li>
+          <li><span class="k5"></span> Sangat Rendah</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Rekap Zona per Kelas</h2>
+      <table>
+        <tr>
+          <th>Kelas Bahaya</th>
+          <th>Jumlah Zona</th>
+          <th>Persentase</th>
+        </tr>
+        <tr id="row-tinggi">
+          <td><mark>Tinggi</mark></td>
+          <td>10</td>
+          <td>3.7%</td>
+        </tr>
+        <tr>
+          <td>Cukup Tinggi</td>
+          <td>70</td>
+          <td>25.6%</td>
+        </tr>
+        <tr>
+          <td>Sedang</td>
+          <td>89</td>
+          <td>32.6%</td>
+        </tr>
+        <tr>
+          <td>Cukup Rendah</td>
+          <td>86</td>
+          <td>31.5%</td>
+        </tr>
+        <tr>
+          <td>Sangat Rendah</td>
+          <td>18</td>
+          <td>6.6%</td>
+        </tr>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 RainSafe Bogor | WebGIS Development Project</p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    var DATA_URL = "data-banjir-bogor.geojson";
+
+    var CLASS_COLOR = {
+      "Tinggi": "#d7191c",
+      "Cukup Tinggi": "#fdae61",
+      "Sedang": "#ffcc00",
+      "Cukup Rendah": "#a6d96a",
+      "Sangat Rendah": "#1a9641"
+    };
+
+    var map = L.map('map').setView([-6.5971, 106.8060], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    function baseStyle(feature) {
+      var kelas = feature.properties.Kelas;
+      return {
+        color: "#555",
+        weight: 1,
+        fillColor: CLASS_COLOR[kelas] || "#999",
+        fillOpacity: 0.55
+      };
+    }
+
+    var hazardLayer = null;
+    var highlightOn = false;
+
+    var statusEl = document.getElementById('map-status');
+    var layerToggle = document.getElementById('layer-toggle');
+    var highlightBtn = document.getElementById('highlight-btn');
+    var mapBox = document.getElementById('map');
+
+    fetch(DATA_URL)
+      .then(function (res) {
+        if (!res.ok) throw new Error('status ' + res.status);
+        return res.json();
+      })
+      .then(function (geojson) {
+        hazardLayer = L.geoJSON(geojson, {
+          style: baseStyle,
+          onEachFeature: function (feature, layer) {
+            var kelas = feature.properties.Kelas;
+            layer.bindPopup('<b>Zona Bahaya Banjir</b><br>Kelas: <b>' + kelas + '</b>');
+          }
+        }).addTo(map);
+
+        map.fitBounds(hazardLayer.getBounds());
+
+        statusEl.textContent = geojson.features.length + ' zona bahaya berhasil dimuat dari ' + DATA_URL + '.';
+        layerToggle.disabled = false;
+        highlightBtn.disabled = false;
+      })
+      .catch(function (err) {
+        statusEl.textContent = 'Gagal memuat data peta (' + err.message +
+          '). Jalankan lewat Live Server / server lokal, bukan file://.';
+      });
+
+    layerToggle.addEventListener('click', function () {
+      if (!hazardLayer) return;
+      if (map.hasLayer(hazardLayer)) {
+        map.removeLayer(hazardLayer);
+        layerToggle.textContent = 'Tampilkan Zona Bahaya';
+      } else {
+        hazardLayer.addTo(map);
+        layerToggle.textContent = 'Sembunyikan Zona Bahaya';
+      }
+    });
+
+    var rowTinggi = document.getElementById('row-tinggi');
+    highlightBtn.addEventListener('click', function () {
+      if (!hazardLayer) return;
+      highlightOn = !highlightOn;
+      hazardLayer.eachLayer(function (layer) {
+        if (layer.feature.properties.Kelas === 'Tinggi') {
+          if (highlightOn) {
+            layer.setStyle({ color: '#000', weight: 3, fillColor: '#ff0033', fillOpacity: 0.9 });
+            layer.bringToFront();
+          } else {
+            layer.setStyle(baseStyle(layer.feature));
+          }
+        }
+      });
+      rowTinggi.classList.toggle('risk-highlight', highlightOn);
+      mapBox.classList.toggle('map-alert', highlightOn);
+      highlightBtn.textContent = highlightOn ? 'Matikan Sorotan' : 'Sorot Kelas Tinggi';
+    });
+  </script>
+
+</body>
+</html>

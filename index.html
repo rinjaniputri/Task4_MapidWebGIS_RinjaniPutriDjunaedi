@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RainSafe Bogor - Home</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">RainSafe Bogor</div>
+    <ul>
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="map.html">Map</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <h1>RainSafe Bogor</h1>
+      <p>
+        <strong>RainSafe Bogor</strong> adalah website sederhana yang menampilkan informasi
+        mengenai area rawan banjir dan fasilitas publik yang berpotensi terdampak di Kota Bogor.
+      </p>
+      <p>
+        Project ini dibuat sebagai latihan penerapan struktur HTML dasar, CSS, dan konsep awal
+        visualisasi WebGIS.
+      </p>
+      <a href="map.html" class="button">Lihat Peta</a>
+    </section>
+
+    <section class="card">
+      <h2>Informasi Proyek</h2>
+      <p>
+        Kota Bogor dikenal memiliki curah hujan yang cukup tinggi. Oleh karena itu,
+        informasi mengenai area rawan banjir menjadi penting agar masyarakat lebih siap
+        dalam menghadapi potensi genangan atau banjir.
+      </p>
+
+      <h3>Tujuan Project</h3>
+      <ul>
+        <li>Menampilkan informasi area rawan banjir.</li>
+        <li>Memberikan gambaran fasilitas publik yang berpotensi terdampak.</li>
+        <li>Membantu masyarakat memahami wilayah yang perlu diwaspadai.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Data yang Digunakan</h2>
+      <table>
+        <tr>
+          <th>No</th>
+          <th>Jenis Data</th>
+          <th>Fungsi</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Area Rawan Banjir</td>
+          <td>Menentukan lokasi prioritas banjir.</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Fasilitas Publik</td>
+          <td>Melihat sekolah, rumah sakit, pasar, dan fasilitas lain yang terdampak.</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Jaringan Jalan</td>
+          <td>Mengetahui akses jalan yang berada di sekitar area rawan.</td>
+        </tr>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Fitur Interaktif</h2>
+      <p>Dua contoh interaksi sederhana menggunakan JavaScript.</p>
+
+      <h3>1. Ganti Warna</h3>
+      <p>Klik tombol untuk mengubah warna kotak di bawah ini.</p>
+      <div id="color-box" class="demo-box">#0F75BC</div>
+      <button id="color-btn" class="button-solid">Ganti Warna Kotak</button>
+
+      <h3>2. Tampilkan / Sembunyikan</h3>
+      <p>Klik tombol untuk menampilkan atau menyembunyikan panel info.</p>
+      <button id="toggle-btn" class="button-solid">Sembunyikan Info</button>
+      <div id="info-panel" class="info-panel">
+        <strong>Info:</strong> Panel ini bisa muncul dan hilang saat tombol
+        diklik. Cocok untuk menyembunyikan detail yang tidak selalu perlu
+        ditampilkan.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Data Zona Bahaya Banjir</h2>
+      <p>
+        Ringkasan <strong>273 zona bahaya banjir Kota Bogor</strong>, di-<em>fetch</em>
+        dari data GeoJSON milik sendiri (<code>data-banjir-bogor.geojson</code>)
+        yang datanya diunduh dari katalog <strong>MAPID (Geomapid)</strong>.
+        Tiap kartu merangkum satu kelas bahaya: jumlah zona, persentase, dan
+        luas perkiraan.
+      </p>
+
+      <div id="data-loading" class="loading-state">
+        <span class="spinner"></span>
+        <span>Memuat data dari MAPID&hellip;</span>
+      </div>
+
+      <div id="data-error" class="error-state">
+        <p class="error-title">&#9888; Gagal memuat data</p>
+        <p id="data-error-message">Terjadi kesalahan saat mengambil data.</p>
+        <p class="error-hint">
+          Tip: buka halaman lewat <strong>Live Server</strong> / server lokal,
+          bukan klik file langsung (<code>file://</code>), agar fetch ke
+          <code>data-banjir-bogor.geojson</code> tidak diblokir browser.
+        </p>
+        <button id="retry-btn" class="button-solid">Coba Lagi</button>
+      </div>
+
+
+      <div id="apartment-list" class="apartment-grid"></div>
+      <p id="data-note" class="data-note"></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 RainSafe Bogor | WebGIS Development Project</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
